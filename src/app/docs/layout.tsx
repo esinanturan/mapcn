@@ -25,14 +25,15 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Header } from "@/components/header";
 
 const navigation = [
   {
-    title: "Getting Started",
+    title: "Basics",
     items: [
-      { title: "Introduction", href: "/docs", icon: BookOpen },
+      { title: "Getting Started", href: "/docs", icon: BookOpen },
       { title: "Installation", href: "/docs/installation", icon: Code },
       {
         title: "API Reference",
@@ -56,6 +57,7 @@ const navigation = [
 
 function DocsSidebar() {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
 
   return (
     <Sidebar className="top-14 border-r bg-transparent **:data-[sidebar=sidebar]:bg-transparent">
@@ -74,7 +76,10 @@ function DocsSidebar() {
                       isActive={pathname === item.href}
                       className="text-muted-foreground hover:text-foreground data-[active=true]:text-foreground data-[active=true]:font-medium"
                     >
-                      <Link href={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setOpenMobile(false)}
+                      >
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
                       </Link>
@@ -108,7 +113,9 @@ export default function DocsLayout({
         />
         <div className="flex flex-1">
           <DocsSidebar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>

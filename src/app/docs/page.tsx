@@ -45,7 +45,15 @@ export default function IntroductionPage() {
           <DocsLink href="https://maplibre.org" external>
             MapLibre GL
           </DocsLink>
-          , styled with Tailwind CSS, and designed to work with shadcn/ui.
+          , styled with{" "}
+          <DocsLink href="https://tailwindcss.com" external>
+            Tailwind CSS
+          </DocsLink>
+          , and designed to work with{" "}
+          <DocsLink href="https://ui.shadcn.com" external>
+            shadcn/ui
+          </DocsLink>
+          .
         </p>
       </DocsSection>
 

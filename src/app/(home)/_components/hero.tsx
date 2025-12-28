@@ -23,7 +23,11 @@ function CopyButton({ text }: { text: string }) {
       onClick={copy}
       className="text-muted-foreground hover:text-foreground transition-colors"
     >
-      {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+      {copied ? (
+        <Check className="size-4 text-emerald-500" />
+      ) : (
+        <Copy className="size-4" />
+      )}
     </button>
   );
 }

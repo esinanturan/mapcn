@@ -43,7 +43,7 @@ export function DocsLayout({
   next,
 }: DocsLayoutProps) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div>
       <DocsHeader title={title} description={description} />
 
       <div className="mt-10 space-y-10">{children}</div>

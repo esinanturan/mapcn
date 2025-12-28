@@ -54,7 +54,7 @@ export default function ApiReferencePage() {
 
       <DocsSection title="Component Anatomy">
         <p>
-          All parts of the componet that you can use and combine to build your
+          All parts of the component that you can use and combine to build your
           map.
         </p>
         <CodeBlock code={anatomyCode} showCopyButton={false} />
