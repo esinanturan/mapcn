@@ -17,7 +17,6 @@ export function DraggableMarkerExample() {
           draggable
           longitude={draggableMarker.lng}
           latitude={draggableMarker.lat}
-          offset={[0, -14]}
           onDragEnd={(lngLat) => {
             setDraggableMarker({ lng: lngLat.lng, lat: lngLat.lat });
           }}
@@ -30,7 +29,7 @@ export function DraggableMarkerExample() {
               />
             </div>
           </MarkerContent>
-          <MarkerPopup offset={[0, -28]}>
+          <MarkerPopup>
             <div className="space-y-1">
               <p className="font-medium text-foreground">Coordinates</p>
               <p className="text-xs text-muted-foreground">
