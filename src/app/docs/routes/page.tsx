@@ -39,11 +39,10 @@ export default function RoutesPage() {
 
       <DocsSection title="Basic Route">
         <p>Draw a route with numbered stop markers along the path.</p>
+        <ComponentPreview code={routeSource}>
+          <RouteExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={routeSource}>
-        <RouteExample />
-      </ComponentPreview>
 
       <DocsSection title="Route Planning">
         <p>
@@ -54,11 +53,10 @@ export default function RoutesPage() {
           </DocsLink>
           . Click on a route or use the buttons to switch.
         </p>
+        <ComponentPreview code={osrmRouteSource} className="h-[500px]">
+          <OsrmRouteExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={osrmRouteSource} className="h-[500px]">
-        <OsrmRouteExample />
-      </ComponentPreview>
     </DocsLayout>
   );
 }

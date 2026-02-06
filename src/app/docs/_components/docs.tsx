@@ -30,7 +30,7 @@ interface DocsHeaderProps {
 
 export function DocsHeader({ title, description }: DocsHeaderProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <h1 className="text-3xl font-semibold tracking-tight text-foreground">
         {title}
       </h1>
@@ -61,17 +61,17 @@ export function DocsLayout({
 }: DocsLayoutProps) {
   return (
     <div className="flex gap-8">
-      <div className="flex-1 min-w-0 max-w-[720px] mx-auto py-8 pb-20">
+      <div className="flex-1 min-w-0 max-w-[720px] mx-auto pt-10 pb-20">
         <DocsHeader title={title} description={description} />
 
-        <div className="mt-10 space-y-10">{children}</div>
+        <div className="mt-12 space-y-12">{children}</div>
 
         {(prev || next) && (
-          <div className="flex items-center justify-between gap-4 mt-12">
+          <div className="flex items-center justify-between gap-4 mt-16">
             {prev ? (
               <Link
                 href={prev.href}
-                className="group flex flex-col items-start gap-1"
+                className="group flex flex-col items-start gap-1.5"
               >
                 <span className="text-xs text-muted-foreground">Previous</span>
                 <span className="text-sm font-medium group-hover:underline underline-offset-4">
@@ -84,7 +84,7 @@ export function DocsLayout({
             {next && (
               <Link
                 href={next.href}
-                className="group flex flex-col items-end gap-1"
+                className="group flex flex-col items-end gap-1.5"
               >
                 <span className="text-xs text-muted-foreground">Next</span>
                 <span className="text-sm font-medium group-hover:underline underline-offset-4">
@@ -96,7 +96,7 @@ export function DocsLayout({
         )}
       </div>
 
-      <aside className="hidden xl:block w-44 shrink-0">
+      <aside className="hidden xl:block w-48 shrink-0">
         <nav className="sticky top-28">
           {toc.length > 0 && <DocsToc items={toc} />}
         </nav>
@@ -114,13 +114,13 @@ interface DocsSectionProps {
 export function DocsSection({ title, children }: DocsSectionProps) {
   const id = title ? slugify(title) : undefined;
   return (
-    <section className="space-y-4 scroll-mt-20" id={id}>
+    <section className="space-y-5 scroll-mt-24" id={id}>
       {title && (
         <h2 className="text-xl font-semibold tracking-tight text-foreground">
           {title}
         </h2>
       )}
-      <div className="text-foreground/80 text-base sm:text-[15px] leading-7 space-y-3 [&_p]:leading-7 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_li]:leading-7 [&_strong]:text-foreground [&_strong]:font-medium [&_em]:text-muted-foreground">
+      <div className="text-foreground/80 text-[15px] leading-7 space-y-4 [&_p]:leading-7 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-2 [&_li]:leading-7 [&_strong]:text-foreground [&_strong]:font-medium [&_em]:text-muted-foreground">
         {children}
       </div>
     </section>
@@ -134,7 +134,7 @@ interface DocsNoteProps {
 
 export function DocsNote({ children }: DocsNoteProps) {
   return (
-    <div className="rounded-lg border bg-muted/40 px-4 py-3 text-[14px] leading-relaxed text-foreground/70 [&_strong]:text-foreground [&_strong]:font-medium">
+    <div className="rounded-lg border bg-muted/30 px-5 py-4 text-[14px] leading-relaxed text-foreground/70 [&_strong]:text-foreground [&_strong]:font-medium">
       {children}
     </div>
   );

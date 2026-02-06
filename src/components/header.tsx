@@ -34,7 +34,7 @@ export function Header({ className, leftContent }: HeaderProps) {
         </div>
         <div className="flex items-center gap-2 h-4.5">
           <CommandSearch />
-          <Separator orientation="vertical" className="hidden sm:block" />
+          <Separator orientation="vertical" className="hidden md:block" />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="sm" asChild>
@@ -44,7 +44,7 @@ export function Header({ className, leftContent }: HeaderProps) {
                   rel="noopener noreferrer"
                 >
                   <Heart className="size-4 text-pink-500" />
-                  <span className="hidden sm:inline">Sponsor</span>
+                  <span className="hidden md:inline font-normal">Sponsor</span>
                 </a>
               </Button>
             </TooltipTrigger>

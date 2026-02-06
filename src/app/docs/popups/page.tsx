@@ -24,11 +24,10 @@ export default function PopupsPage() {
           on the map. Unlike <DocsCode>MarkerPopup</DocsCode>, standalone popups
           are not attached to markers and can be controlled programmatically.
         </p>
+        <ComponentPreview code={popupSource}>
+          <StandalonePopupExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={popupSource}>
-        <StandalonePopupExample />
-      </ComponentPreview>
     </DocsLayout>
   );
 }

@@ -57,33 +57,30 @@ export default function MarkersPage() {
         <p>
           Simple markers with tooltips and popups showing location information.
         </p>
+        <ComponentPreview code={markersSource}>
+          <MarkersExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={markersSource}>
-        <MarkersExample />
-      </ComponentPreview>
 
       <DocsSection title="Rich Popups">
         <p>
           Build complex popups with images, ratings, and action buttons using
           shadcn/ui components.
         </p>
+        <ComponentPreview code={popupSource} className="h-[500px]">
+          <PopupExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={popupSource} className="h-[500px]">
-        <PopupExample />
-      </ComponentPreview>
 
       <DocsSection title="Draggable Marker">
         <p>
           Create draggable markers that users can move around the map. Click the
           marker to see its current coordinates in a popup.
         </p>
+        <ComponentPreview code={draggableMarkerSource}>
+          <DraggableMarkerExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={draggableMarkerSource}>
-        <DraggableMarkerExample />
-      </ComponentPreview>
     </DocsLayout>
   );
 }

@@ -14,9 +14,11 @@ export default function DocsLayout({
           className="sticky top-0 z-50 bg-background/95 border-b backdrop-blur supports-backdrop-filter:bg-background/60"
           leftContent={<MobileSidebarTrigger />}
         />
-        <div className="flex flex-1 container">
-          <DocsSidebar />
-          <main className="flex-1 w-full">{children}</main>
+        <div className="container flex-1">
+          <div className="flex">
+            <DocsSidebar />
+            <main className="flex-1 w-full">{children}</main>
+          </div>
         </div>
       </div>
     </SidebarProvider>

@@ -130,22 +130,20 @@ export default function AdvancedPage() {
           map&apos;s pitch and bearing, and listen to map events to display
           real-time values.
         </p>
+        <ComponentPreview code={advancedSource}>
+          <AdvancedUsageExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={advancedSource}>
-        <AdvancedUsageExample />
-      </ComponentPreview>
 
       <DocsSection title="Example: Custom GeoJSON Layer">
         <p>
           Add custom GeoJSON data as layers with fill and outline styles. This
           example shows NYC parks with hover interactions.
         </p>
+        <ComponentPreview code={customLayerSource}>
+          <CustomLayerExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={customLayerSource}>
-        <CustomLayerExample />
-      </ComponentPreview>
 
       <DocsSection title="Example: Markers via Layers">
         <p>
@@ -154,11 +152,10 @@ export default function AdvancedPage() {
           approach renders markers on the WebGL canvas, providing significantly
           better performance.
         </p>
+        <ComponentPreview code={layerMarkersSource}>
+          <LayerMarkersExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={layerMarkersSource}>
-        <LayerMarkersExample />
-      </ComponentPreview>
 
       <DocsSection title="Extend to Build">
         <p>You can extend this to build custom features like:</p>

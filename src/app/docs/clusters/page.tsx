@@ -32,11 +32,10 @@ export default function ClustersPage() {
           Click on clusters to zoom in. Click individual points to see details
           in a popup.
         </p>
+        <ComponentPreview code={clusterSource}>
+          <ClusterExample />
+        </ComponentPreview>
       </DocsSection>
-
-      <ComponentPreview code={clusterSource}>
-        <ClusterExample />
-      </ComponentPreview>
     </DocsLayout>
   );
 }

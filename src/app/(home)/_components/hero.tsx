@@ -34,18 +34,14 @@ function CopyButton({ text }: { text: string }) {
 export function Hero() {
   return (
     <div className="relative">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-x-0 -inset-y-32 -z-10 overflow-hidden">
         <div
-          className="absolute inset-0 opacity-[0.4] dark:opacity-[0.15]"
+          className="absolute inset-0 opacity-[0.3] dark:opacity-[0.15]"
           style={{
             backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
             backgroundSize: "24px 24px",
           }}
         />
-
-        <div className="absolute -top-40 -right-40 size-96 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 size-96 bg-sky-500/10 rounded-full blur-3xl" />
-
         <div className="absolute inset-0 bg-linear-to-b from-background via-transparent to-background" />
       </div>
 
@@ -63,11 +59,11 @@ export function Hero() {
         </p>
 
         <div className="mt-8 animate-fade-up delay-300 w-full max-w-xl">
-          <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-card border border-border rounded-lg shadow-xs overflow-hidden">
             <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/50">
-              <span className="size-2.5 rounded-full bg-red-500/40" />
-              <span className="size-2.5 rounded-full bg-yellow-500/40" />
-              <span className="size-2.5 rounded-full bg-green-500/40" />
+              <span className="size-2 rounded-full bg-foreground/20" />
+              <span className="size-2 rounded-full bg-foreground/20" />
+              <span className="size-2 rounded-full bg-foreground/20" />
             </div>
 
             <div className="flex items-center gap-3 px-4 py-3 font-mono text-sm">
@@ -88,9 +84,7 @@ export function Hero() {
             </Link>
           </Button>
           <Button variant="ghost" size="lg" asChild>
-            <Link href="/docs/basic-map" className="text-muted-foreground">
-              View Components
-            </Link>
+            <Link href="/docs/basic-map">View Components</Link>
           </Button>
         </div>
       </div>

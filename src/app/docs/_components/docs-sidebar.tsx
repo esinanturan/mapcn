@@ -33,7 +33,7 @@ export function DocsSidebar() {
       <SidebarContent className="pt-8 no-scrollbar overflow-x-hidden">
         {docsNavigation.map((group) => (
           <SidebarGroup key={group.title} className="px-1">
-            <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+            <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>

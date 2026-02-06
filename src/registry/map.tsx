@@ -82,6 +82,16 @@ type MapContextValue = {
 
 const MapContext = createContext<MapContextValue | null>(null);
 
+function getViewport(map: MapLibreGL.Map): MapViewport {
+  const center = map.getCenter();
+  return {
+    center: [center.lng, center.lat],
+    zoom: map.getZoom(),
+    bearing: map.getBearing(),
+    pitch: map.getPitch(),
+  };
+}
+
 function useMap() {
   const context = useContext(MapContext);
   if (!context) {
@@ -99,8 +109,24 @@ type MapStyleOption = string | MapLibreGL.StyleSpecification;
 
 type Theme = "light" | "dark";
 
+/** Map viewport state */
+type MapViewport = {
+  /** Center coordinates [longitude, latitude] */
+  center: [number, number];
+  /** Zoom level */
+  zoom: number;
+  /** Bearing (rotation) in degrees */
+  bearing: number;
+  /** Pitch (tilt) in degrees */
+  pitch: number;
+};
+
 type MapProps = {
   children?: ReactNode;
+  /** Additional CSS classes for the map container */
+  className?: string;
+  /** Custom loading component. Defaults to animated dots */
+  loader?: ReactNode;
   /**
    * Theme for the map. If not provided, automatically detects system preference.
    * Pass your theme value here.
@@ -113,6 +139,17 @@ type MapProps = {
   };
   /** Map projection type. Use `{ type: "globe" }` for 3D globe view. */
   projection?: MapLibreGL.ProjectionSpecification;
+  /**
+   * Controlled viewport. When provided with onViewportChange,
+   * the map becomes controlled and viewport is driven by this prop.
+   */
+  viewport?: Partial<MapViewport>;
+  /**
+   * Callback fired continuously as the viewport changes (pan, zoom, rotate, pitch).
+   * When used with `viewport` prop, enables controlled mode.
+   * Receives the new viewport state to update your state.
+   */
+  onViewportChange?: (viewport: MapViewport) => void;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 type MapRef = MapLibreGL.Map;
@@ -128,7 +165,17 @@ const DefaultLoader = () => (
 );
 
 const Map = forwardRef<MapRef, MapProps>(function Map(
-  { children, theme: themeProp, styles, projection, ...props },
+  {
+    children,
+    className,
+    loader,
+    theme: themeProp,
+    styles,
+    projection,
+    viewport,
+    onViewportChange,
+    ...props
+  },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -137,7 +184,13 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const currentStyleRef = useRef<MapStyleOption | null>(null);
   const styleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const internalUpdateRef = useRef(false);
   const resolvedTheme = useResolvedTheme(themeProp);
+
+  const isControlled = viewport !== undefined && onViewportChange !== undefined;
+
+  const onViewportChangeRef = useRef(onViewportChange);
+  onViewportChangeRef.current = onViewportChange;
 
   const mapStyles = useMemo(
     () => ({
@@ -147,6 +200,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     [styles]
   );
 
+  // Expose the map instance to the parent component
   useImperativeHandle(ref, () => mapInstance as MapLibreGL.Map, [mapInstance]);
 
   const clearStyleTimeout = useCallback(() => {
@@ -156,6 +210,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     }
   }, []);
 
+  // Initialize the map
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -171,6 +226,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
         compact: true,
       },
       ...props,
+      ...viewport,
     });
 
     const styleDataHandler = () => {
@@ -187,14 +243,22 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     };
     const loadHandler = () => setIsLoaded(true);
 
+    // Viewport change handler - skip if triggered by internal update
+    const handleMove = () => {
+      if (internalUpdateRef.current) return;
+      onViewportChangeRef.current?.(getViewport(map));
+    };
+
     map.on("load", loadHandler);
     map.on("styledata", styleDataHandler);
+    map.on("move", handleMove);
     setMapInstance(map);
 
     return () => {
       clearStyleTimeout();
       map.off("load", loadHandler);
       map.off("styledata", styleDataHandler);
+      map.off("move", handleMove);
       map.remove();
       setIsLoaded(false);
       setIsStyleLoaded(false);
@@ -203,6 +267,23 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sync controlled viewport to map
+  useEffect(() => {
+    if (!mapInstance || !isControlled || !viewport) return;
+    if (mapInstance.isMoving()) return;
+
+    const current = getViewport(mapInstance);
+    internalUpdateRef.current = true;
+    mapInstance.jumpTo({
+      center: viewport.center ?? current.center,
+      zoom: viewport.zoom ?? current.zoom,
+      bearing: viewport.bearing ?? current.bearing,
+      pitch: viewport.pitch ?? current.pitch,
+    });
+    internalUpdateRef.current = false;
+  }, [mapInstance, isControlled, viewport]);
+
+  // Handle style change
   useEffect(() => {
     if (!mapInstance || !resolvedTheme) return;
 
@@ -228,8 +309,11 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
 
   return (
     <MapContext.Provider value={contextValue}>
-      <div ref={containerRef} className="relative w-full h-full">
-        {!isLoaded && <DefaultLoader />}
+      <div
+        ref={containerRef}
+        className={cn("relative w-full h-full", className)}
+      >
+        {!isLoaded && (loader ?? <DefaultLoader />)}
         {/* SSR-safe: children render only when map is loaded on client */}
         {mapInstance && children}
       </div>
@@ -288,6 +372,23 @@ function MapMarker({
 }: MapMarkerProps) {
   const { map } = useMap();
 
+  const callbacksRef = useRef({
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onDragStart,
+    onDrag,
+    onDragEnd,
+  });
+  callbacksRef.current = {
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onDragStart,
+    onDrag,
+    onDragEnd,
+  };
+
   const marker = useMemo(() => {
     const markerInstance = new MapLibreGL.Marker({
       ...markerOptions,
@@ -295,9 +396,11 @@ function MapMarker({
       draggable,
     }).setLngLat([longitude, latitude]);
 
-    const handleClick = (e: MouseEvent) => onClick?.(e);
-    const handleMouseEnter = (e: MouseEvent) => onMouseEnter?.(e);
-    const handleMouseLeave = (e: MouseEvent) => onMouseLeave?.(e);
+    const handleClick = (e: MouseEvent) => callbacksRef.current.onClick?.(e);
+    const handleMouseEnter = (e: MouseEvent) =>
+      callbacksRef.current.onMouseEnter?.(e);
+    const handleMouseLeave = (e: MouseEvent) =>
+      callbacksRef.current.onMouseLeave?.(e);
 
     markerInstance.getElement()?.addEventListener("click", handleClick);
     markerInstance
@@ -309,15 +412,15 @@ function MapMarker({
 
     const handleDragStart = () => {
       const lngLat = markerInstance.getLngLat();
-      onDragStart?.({ lng: lngLat.lng, lat: lngLat.lat });
+      callbacksRef.current.onDragStart?.({ lng: lngLat.lng, lat: lngLat.lat });
     };
     const handleDrag = () => {
       const lngLat = markerInstance.getLngLat();
-      onDrag?.({ lng: lngLat.lng, lat: lngLat.lat });
+      callbacksRef.current.onDrag?.({ lng: lngLat.lng, lat: lngLat.lat });
     };
     const handleDragEnd = () => {
       const lngLat = markerInstance.getLngLat();
-      onDragEnd?.({ lng: lngLat.lng, lat: lngLat.lat });
+      callbacksRef.current.onDragEnd?.({ lng: lngLat.lng, lat: lngLat.lat });
     };
 
     markerInstance.on("dragstart", handleDragStart);
@@ -827,6 +930,8 @@ function MapPopup({
 }: MapPopupProps) {
   const { map } = useMap();
   const popupOptionsRef = useRef(popupOptions);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const container = useMemo(() => document.createElement("div"), []);
 
   const popup = useMemo(() => {
@@ -845,7 +950,8 @@ function MapPopup({
   useEffect(() => {
     if (!map) return;
 
-    const onCloseProp = () => onClose?.();
+    const onCloseProp = () => onCloseRef.current?.();
+
     popup.on("close", onCloseProp);
 
     popup.setDOMContent(container);
@@ -881,7 +987,6 @@ function MapPopup({
 
   const handleClose = () => {
     popup.remove();
-    onClose?.();
   };
 
   return createPortal(
@@ -1058,7 +1163,7 @@ type MapClusterLayerProps<
   clusterMaxZoom?: number;
   /** Radius of each cluster when clustering points in pixels (default: 50) */
   clusterRadius?: number;
-  /** Colors for cluster circles: [small, medium, large] based on point count (default: ["#51bbd6", "#f1f075", "#f28cb1"]) */
+  /** Colors for cluster circles: [small, medium, large] based on point count (default: ["#22c55e", "#eab308", "#ef4444"]) */
   clusterColors?: [string, string, string];
   /** Point count thresholds for color/size steps: [medium, large] (default: [100, 750]) */
   clusterThresholds?: [number, number];
@@ -1083,7 +1188,7 @@ function MapClusterLayer<
   data,
   clusterMaxZoom = 14,
   clusterRadius = 50,
-  clusterColors = ["#51bbd6", "#f1f075", "#f28cb1"],
+  clusterColors = ["#22c55e", "#eab308", "#ef4444"],
   clusterThresholds = [100, 750],
   pointColor = "#3b82f6",
   onPointClick,
@@ -1140,6 +1245,9 @@ function MapClusterLayer<
           clusterThresholds[1],
           40,
         ],
+        "circle-stroke-width": 1,
+        "circle-stroke-color": "#fff",
+        "circle-opacity": 0.85,
       },
     });
 
@@ -1166,7 +1274,9 @@ function MapClusterLayer<
       filter: ["!", ["has", "point_count"]],
       paint: {
         "circle-color": pointColor,
-        "circle-radius": 6,
+        "circle-radius": 5,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#fff",
       },
     });
 
@@ -1360,4 +1470,4 @@ export {
   MapClusterLayer,
 };
 
-export type { MapRef };
+export type { MapRef, MapViewport };

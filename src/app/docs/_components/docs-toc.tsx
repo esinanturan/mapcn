@@ -57,28 +57,33 @@ export function DocsToc({ items, className }: DocsTocProps) {
   }
 
   return (
-    <div className={cn("flex flex-col gap-2.5 text-sm", className)}>
-      <p className="text-muted-foreground text-xs font-medium mb-1">
-        On This Page
-      </p>
-      {items.map((item) => (
-        <a
-          key={item.slug}
-          href={`#${item.slug}`}
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById(item.slug)?.scrollIntoView({
-              behavior: "smooth",
-            });
-          }}
-          className={cn(
-            "text-muted-foreground hover:text-foreground text-[0.8rem] no-underline transition-colors",
-            item.slug === activeHeading && "text-foreground"
-          )}
-        >
-          {item.title}
-        </a>
-      ))}
+    <div className={cn("flex flex-col gap-1", className)}>
+      <p className="text-foreground text-xs font-medium mb-2">On This Page</p>
+      <div className="relative">
+        <div className="absolute left-0 top-1 bottom-1 w-px bg-border" />
+        <div className="flex flex-col gap-1">
+          {items.map((item) => {
+            const isActive = item.slug === activeHeading;
+            return (
+              <a
+                key={item.slug}
+                href={`#${item.slug}`}
+                className={cn(
+                  "relative pl-3 py-1 text-[13px] no-underline transition-colors",
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {isActive && (
+                  <div className="absolute left-0 top-1 bottom-1 w-px bg-foreground rounded-full" />
+                )}
+                {item.title}
+              </a>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

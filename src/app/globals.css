@@ -118,7 +118,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 overscroll-none;
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground font-sans;
@@ -136,7 +136,7 @@
 }
 
 .container {
-  @apply max-w-[1440px] mx-auto px-6;
+  @apply max-w-[1480px] mx-auto px-6;
 }
 
 /*  animations for the home page */
