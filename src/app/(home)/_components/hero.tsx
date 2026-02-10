@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "site-url-here";
-const installCommand = `npx shadcn@latest add ${siteUrl}/maps/map.json`;
+const installCommand = `npx shadcn@latest add ${siteUrl}/r/map.json`;
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);

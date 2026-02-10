@@ -12,7 +12,7 @@ import { Map, MapControls } from "@/registry/map";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "site-url-here";
 
-const installCode = `npx shadcn@latest add ${siteUrl}/maps/map.json`;
+const installCode = `npx shadcn@latest add ${siteUrl}/r/map.json`;
 
 const usageCode = `import { Map, MapControls } from "@/components/ui/map";
 import { Card } from "@/components/ui/card";

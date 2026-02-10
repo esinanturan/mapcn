@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "registry:build": "npx shadcn build -o ./public/maps"
+    "registry:build": "npx shadcn build -o ./public/r"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
