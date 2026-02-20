@@ -1,9 +1,3 @@
-<p align="center">
-  <a href="https://vercel.com/oss">
-    <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
-  </a>
-</p>
-
 <h1 align="center">mapcn</h1>
 
 <p align="center">
@@ -15,6 +9,14 @@
   <a href="https://mapcn.dev/docs">Get Started</a> ·
   <a href="https://mapcn.dev/docs/installation">Installation</a> ·
   <a href="https://mapcn.dev/docs/basic-map">Components</a>
+</p>
+
+<br />
+
+<p align="center">
+  <a href="https://vercel.com/oss">
+    <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
+  </a>
 </p>
 
 <p align="center">
