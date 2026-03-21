@@ -1,18 +1,4 @@
-import {
-  BookOpen,
-  Braces,
-  Code,
-  Home,
-  Layers,
-  LayoutGrid,
-  LucideIcon,
-  Map,
-  MapPin,
-  MessageSquare,
-  Route,
-  Settings,
-  Wrench,
-} from "lucide-react";
+import { BookOpen, CornerDownRight, Layers2, LucideIcon } from "lucide-react";
 
 export interface MainNavItem {
   href: string;
@@ -36,29 +22,29 @@ export const docsNavigation: SiteNavigationGroup[] = [
     title: "Basics",
     items: [
       { title: "Getting Started", href: "/docs", icon: BookOpen },
-      { title: "Installation", href: "/docs/installation", icon: Code },
-      { title: "API Reference", href: "/docs/api-reference", icon: Braces },
+      { title: "Installation", href: "/docs/installation", icon: BookOpen },
+      { title: "API Reference", href: "/docs/api-reference", icon: BookOpen },
     ],
   },
   {
     title: "Components",
     items: [
-      { title: "Map", href: "/docs/basic-map", icon: Map },
-      { title: "Controls", href: "/docs/controls", icon: Settings },
-      { title: "Markers", href: "/docs/markers", icon: MapPin },
-      { title: "Popups", href: "/docs/popups", icon: MessageSquare },
-      { title: "Routes", href: "/docs/routes", icon: Route },
-      { title: "Clusters", href: "/docs/clusters", icon: Layers },
-      { title: "Advanced", href: "/docs/advanced-usage", icon: Wrench },
+      { title: "Map", href: "/docs/basic-map", icon: Layers2 },
+      { title: "Controls", href: "/docs/controls", icon: Layers2 },
+      { title: "Markers", href: "/docs/markers", icon: Layers2 },
+      { title: "Popups", href: "/docs/popups", icon: Layers2 },
+      { title: "Routes", href: "/docs/routes", icon: Layers2 },
+      { title: "Clusters", href: "/docs/clusters", icon: Layers2 },
+      { title: "Advanced", href: "/docs/advanced-usage", icon: Layers2 },
     ],
   },
 ];
 
 const navItems: SiteNavigationItem[] = [
-  { title: "Home", href: "/", icon: Home },
-  { title: "Docs", href: "/docs", icon: BookOpen },
-  { title: "Components", href: "/docs/basic-map", icon: Map },
-  { title: "Blocks", href: "/blocks", icon: LayoutGrid },
+  { title: "Home", href: "/", icon: CornerDownRight },
+  { title: "Docs", href: "/docs", icon: CornerDownRight },
+  { title: "Components", href: "/docs/basic-map", icon: CornerDownRight },
+  { title: "Blocks", href: "/blocks", icon: CornerDownRight },
 ];
 
 export const siteNavigation: SiteNavigationGroup[] = [
