@@ -50,14 +50,14 @@ export const mapConfig = {
     light: {
       background: "#fafafa",
       base: "#eef0f3",
-      ramp: ["#bfdbfe", "#60a5fa", "#3b82f6", "#1d4ed8"],
-      hover: "#1e3a8a",
+      ramp: ["#d4d4d4", "#a3a3a3", "#525252", "#262626"],
+      hover: "#0a0a0a",
     },
     dark: {
       background: "#0a0a0a",
       base: "#1a1a1a",
-      ramp: ["#1d4ed8", "#3b82f6", "#60a5fa", "#93c5fd"],
-      hover: "#bfdbfe",
+      ramp: ["#404040", "#737373", "#a3a3a3", "#d4d4d4"],
+      hover: "#fafafa",
     },
   } satisfies Record<Theme, ChoroplethColors>,
 };
