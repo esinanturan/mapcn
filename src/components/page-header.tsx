@@ -4,9 +4,14 @@ import { cn } from "@/lib/utils";
 import { createContext, useContext, type CSSProperties } from "react";
 
 type HeaderAlign = "center" | "left";
+type HeaderSize = "default" | "sm";
 
-const PageHeaderContext = createContext<{ align: HeaderAlign }>({
+const PageHeaderContext = createContext<{
+  align: HeaderAlign;
+  size: HeaderSize;
+}>({
   align: "center",
+  size: "default",
 });
 
 function usePageHeaderContext() {
@@ -18,14 +23,24 @@ interface PageHeaderProps {
   className?: string;
   /** Header content alignment (default: center) */
   align?: HeaderAlign;
+  /** Visual scale of the header (default: "default") */
+  size?: HeaderSize;
 }
 
-function PageHeader({ children, className, align = "center" }: PageHeaderProps) {
+function PageHeader({
+  children,
+  className,
+  align = "center",
+  size = "default",
+}: PageHeaderProps) {
   return (
-    <PageHeaderContext.Provider value={{ align }}>
+    <PageHeaderContext.Provider value={{ align, size }}>
       <section
         className={cn(
-          "container mx-auto flex w-full max-w-6xl flex-col gap-4 py-16 md:py-20 lg:py-24",
+          "container mx-auto flex w-full max-w-6xl flex-col",
+          size === "sm"
+            ? "gap-3 py-14 md:py-16"
+            : "gap-4 py-16 md:py-20 lg:py-24",
           align === "center"
             ? "items-center text-center"
             : "items-start text-left",
@@ -49,12 +64,15 @@ function PageHeaderHeading({
   className,
   as: Comp = "h1",
 }: PageHeaderHeadingProps) {
-  const { align } = usePageHeaderContext();
+  const { align, size } = usePageHeaderContext();
 
   return (
     <Comp
       className={cn(
-        "animate-fade-up animate-stagger max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl",
+        "animate-fade-up animate-stagger max-w-4xl font-bold tracking-tight",
+        size === "sm"
+          ? "text-3xl font-semibold md:text-4xl"
+          : "text-4xl sm:text-5xl md:text-6xl",
         align === "center" ? "text-center" : "text-left",
         className,
       )}
@@ -80,12 +98,15 @@ function PageHeaderDescription({
   children,
   className,
 }: PageHeaderDescriptionProps) {
-  const { align } = usePageHeaderContext();
+  const { align, size } = usePageHeaderContext();
 
   return (
     <p
       className={cn(
-        "text-foreground/80 animate-fade-up animate-stagger max-w-2xl leading-relaxed sm:text-lg sm:leading-relaxed md:text-xl md:leading-relaxed",
+        "text-foreground/80 animate-fade-up animate-stagger max-w-2xl leading-relaxed",
+        size === "sm"
+          ? "text-muted-foreground text-base sm:text-lg"
+          : "sm:text-lg md:text-xl",
         align === "center" ? "text-center" : "text-left",
         className,
       )}

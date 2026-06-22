@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Fullscreen, Terminal } from "lucide-react";
+import { Check, Maximize, Terminal } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { RegistryBlockItem, type FileTree } from "@/lib/blocks";
@@ -41,9 +41,9 @@ export function BlockPreview({
       }
     >
       <div>
-        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
         {description && (
-          <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">{description}</p>
         )}
       </div>
 
@@ -58,7 +58,18 @@ export function BlockPreview({
             </TabsTrigger>
           </TabsList>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-2.5 md:flex">
+            <Button
+              onClick={copyCli}
+              variant="outline"
+              aria-label="Copy CLI command"
+              size="sm"
+              className="font-mono text-xs"
+            >
+              {copiedType === "cli" ? <Check /> : <Terminal />}
+              npx shadcn add @mapcn/{name}
+            </Button>
+            <Separator orientation="vertical" className="h-4!" />
             <Button
               variant="outline"
               size="icon-sm"
@@ -66,18 +77,8 @@ export function BlockPreview({
               aria-label="Open in new tab"
             >
               <Link href={`/view/${name}`} target="_blank">
-                <Fullscreen />
+                <Maximize />
               </Link>
-            </Button>
-            <Separator orientation="vertical" className="h-4!" />
-            <Button
-              onClick={copyCli}
-              variant="outline"
-              aria-label="Copy CLI command"
-              size="sm"
-            >
-              {copiedType === "cli" ? <Check /> : <Terminal />}
-              npx shadcn add @mapcn/{name}
             </Button>
           </div>
         </div>

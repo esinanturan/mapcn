@@ -51,7 +51,7 @@ export function GetStartedActions() {
           </Button>
         )}
 
-        <ButtonGroupSeparator className="bg-primary-foreground" />
+        <ButtonGroupSeparator />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -95,7 +95,7 @@ export function GetStartedActions() {
       </ButtonGroup>
 
       {copied && (
-        <p className="animate-fade-in text-muted-foreground absolute top-full left-0 mt-2 flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <p className="animate-fade-up text-muted-foreground absolute top-full left-0 mt-2 flex items-center gap-1 text-xs whitespace-nowrap">
           <Check className="size-3.5" />
           Copied - paste this into your coding agent!
         </p>
