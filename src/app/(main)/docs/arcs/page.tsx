@@ -18,7 +18,7 @@ export default function ArcsPage() {
       title="Arcs"
       description="Draw curved connections between two coordinates with hover and click support."
       prev={{ title: "Routes", href: "/docs/routes" }}
-      next={{ title: "Clusters", href: "/docs/clusters" }}
+      next={{ title: "GeoJSON", href: "/docs/geojson" }}
       toc={[
         { title: "Basic Arc", slug: "basic-arc" },
         { title: "Interactive Arcs", slug: "interactive-arcs" },

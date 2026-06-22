@@ -29,6 +29,50 @@
             "@apply hidden!": {}
           }
         }
+      },
+      "meta": {
+        "components": [
+          {
+            "title": "Map",
+            "href": "/llm/map",
+            "description": "Base MapLibre-powered map component."
+          },
+          {
+            "title": "Controls",
+            "href": "/docs/controls",
+            "description": "Zoom, geolocate, fullscreen, and compass controls."
+          },
+          {
+            "title": "Markers",
+            "href": "/docs/markers",
+            "description": "Map markers with labels, tooltips, and popup composition."
+          },
+          {
+            "title": "Popups",
+            "href": "/docs/popups",
+            "description": "Standalone and marker-attached popup content."
+          },
+          {
+            "title": "Routes",
+            "href": "/docs/routes",
+            "description": "Line routes with optional markers and interaction handlers."
+          },
+          {
+            "title": "Arcs",
+            "href": "/docs/arcs",
+            "description": "Curved connection arcs between coordinates."
+          },
+          {
+            "title": "GeoJSON",
+            "href": "/docs/geojson",
+            "description": "GeoJSON sources and layers for custom map data."
+          },
+          {
+            "title": "Clusters",
+            "href": "/docs/clusters",
+            "description": "Clustered point layers for dense datasets."
+          }
+        ]
       }
     },
     {
@@ -97,6 +141,11 @@
           "path": "src/registry/blocks/choropleth/data.ts",
           "type": "registry:component",
           "target": "app/choropleth/data.ts"
+        },
+        {
+          "path": "src/lib/use-world-data.ts",
+          "type": "registry:lib",
+          "target": "@lib/use-world-data.ts"
         }
       ],
       "categories": [
@@ -108,43 +157,24 @@
       }
     },
     {
-      "name": "store-locator",
+      "name": "heatmap",
       "type": "registry:block",
-      "title": "Store Locator",
-      "description": "Searchable store list synced with map markers.",
-      "dependencies": [
-        "lucide-react"
-      ],
+      "title": "Heatmap",
+      "description": "Globe-projected heatmap visualizing earthquake density with zoom-dependent styling.",
+      "dependencies": [],
       "registryDependencies": [
-        "@mapcn/map",
-        "input",
-        "sidebar"
+        "@mapcn/map"
       ],
       "files": [
         {
-          "path": "src/registry/blocks/store-locator/page.tsx",
+          "path": "src/registry/blocks/heatmap/page.tsx",
           "type": "registry:page",
-          "target": "app/store-locator/page.tsx"
-        },
-        {
-          "path": "src/registry/blocks/store-locator/data.ts",
-          "type": "registry:component",
-          "target": "app/store-locator/data.ts"
-        },
-        {
-          "path": "src/registry/blocks/store-locator/components/store-list.tsx",
-          "type": "registry:component",
-          "target": "app/store-locator/components/store-list.tsx"
-        },
-        {
-          "path": "src/registry/blocks/store-locator/components/locator-map.tsx",
-          "type": "registry:component",
-          "target": "app/store-locator/components/locator-map.tsx"
+          "target": "app/heatmap/page.tsx"
         }
       ],
       "categories": [
-        "store-locator",
-        "locator"
+        "visualization",
+        "heatmap"
       ],
       "meta": {
         "iframeHeight": "800px"
@@ -194,6 +224,49 @@
       }
     },
     {
+      "name": "store-locator",
+      "type": "registry:block",
+      "title": "Store Locator",
+      "description": "Searchable store list synced with map markers.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@mapcn/map",
+        "input",
+        "sidebar"
+      ],
+      "files": [
+        {
+          "path": "src/registry/blocks/store-locator/page.tsx",
+          "type": "registry:page",
+          "target": "app/store-locator/page.tsx"
+        },
+        {
+          "path": "src/registry/blocks/store-locator/data.ts",
+          "type": "registry:component",
+          "target": "app/store-locator/data.ts"
+        },
+        {
+          "path": "src/registry/blocks/store-locator/components/store-list.tsx",
+          "type": "registry:component",
+          "target": "app/store-locator/components/store-list.tsx"
+        },
+        {
+          "path": "src/registry/blocks/store-locator/components/locator-map.tsx",
+          "type": "registry:component",
+          "target": "app/store-locator/components/locator-map.tsx"
+        }
+      ],
+      "categories": [
+        "store-locator",
+        "locator"
+      ],
+      "meta": {
+        "iframeHeight": "800px"
+      }
+    },
+    {
       "name": "delivery-tracker",
       "type": "registry:block",
       "title": "Delivery Tracker",
@@ -220,31 +293,6 @@
       ],
       "meta": {
         "iframeHeight": "680px"
-      }
-    },
-    {
-      "name": "heatmap",
-      "type": "registry:block",
-      "title": "Heatmap",
-      "description": "Globe-projected heatmap visualizing earthquake density with zoom-dependent styling.",
-      "dependencies": [],
-      "registryDependencies": [
-        "@mapcn/map",
-        "card"
-      ],
-      "files": [
-        {
-          "path": "src/registry/blocks/heatmap/page.tsx",
-          "type": "registry:page",
-          "target": "app/heatmap/page.tsx"
-        }
-      ],
-      "categories": [
-        "visualization",
-        "heatmap"
-      ],
-      "meta": {
-        "iframeHeight": "800px"
       }
     }
   ]

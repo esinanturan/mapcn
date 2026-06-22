@@ -3,7 +3,6 @@
 import { useEffect, useId } from "react";
 
 import { Map, useMap } from "@/registry/map";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const EARTHQUAKE_GEOJSON_URL =
   "https://maplibre.org/maplibre-gl-js/docs/assets/earthquakes.geojson";
@@ -146,9 +145,11 @@ function GlobeHeatmapLayers() {
   return null;
 }
 
+const gradient = `linear-gradient(to right, ${HEATMAP_GRADIENT_COLORS.join(", ")})`;
+
 export default function Page() {
   return (
-    <div className="bg-muted/50 relative h-screen">
+    <div className="bg-card relative h-screen">
       <div className="relative h-full">
         <Map
           center={[-113, 43]}
@@ -162,37 +163,20 @@ export default function Page() {
         </Map>
       </div>
 
-      <Card className="absolute top-4 left-4 z-10 w-72">
-        <CardHeader>
-          <CardTitle>Global Earthquakes Heatmap</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-5 gap-1.5">
-            {HEATMAP_GRADIENT_COLORS.map((color) => (
-              <span
-                key={color}
-                className="h-2.5 rounded-full"
-                style={{ backgroundColor: color }}
-              />
-            ))}
-          </div>
-          <div className="text-muted-foreground flex items-center justify-between pt-3 text-xs">
-            <span>Low</span>
-            <span>High</span>
-          </div>
-          <p className="text-muted-foreground pt-2 text-xs">
-            Data source:{" "}
-            <a
-              href={EARTHQUAKE_GEOJSON_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground underline underline-offset-4 transition-colors"
-            >
-              MapLibre earthquakes.geojson
-            </a>
-          </p>
-        </CardContent>
-      </Card>
+      <div className="bg-card/90 absolute top-4 left-4 z-10 rounded-lg border px-3 py-2.5 backdrop-blur-sm">
+        <p className="text-foreground text-sm font-medium">
+          Global Earthquakes Heatmap
+        </p>
+
+        <div
+          className="mt-3 h-2 w-full rounded-full"
+          style={{ backgroundImage: gradient }}
+        />
+        <div className="text-muted-foreground flex items-center justify-between pt-1.5 text-[10px]">
+          <span>Low</span>
+          <span>High</span>
+        </div>
+      </div>
     </div>
   );
 }

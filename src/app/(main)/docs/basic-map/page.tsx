@@ -3,11 +3,13 @@ import {
   DocsSection,
   DocsCode,
   DocsLink,
+  DocsNote,
 } from "../_components/docs";
 import { ComponentPreview } from "../_components/component-preview";
 import { BasicMapExample } from "../_components/examples/basic-map-example";
 import { ControlledMapExample } from "../_components/examples/controlled-map-example";
 import { CustomStyleExample } from "../_components/examples/custom-style-example";
+import { BlankMapExample } from "../_components/examples/blank-map-example";
 import { getExampleSource } from "../_components/get-example-source";
 import { Metadata } from "next";
 
@@ -19,6 +21,7 @@ export default function BasicMapPage() {
   const basicMapSource = getExampleSource("basic-map-example.tsx");
   const controlledMapSource = getExampleSource("controlled-map-example.tsx");
   const customStyleSource = getExampleSource("custom-style-example.tsx");
+  const blankMapSource = getExampleSource("blank-map-example.tsx");
 
   return (
     <DocsLayout
@@ -29,6 +32,7 @@ export default function BasicMapPage() {
       toc={[
         { title: "Basic Usage", slug: "basic-usage" },
         { title: "Controlled Mode", slug: "controlled-mode" },
+        { title: "Blank Basemap", slug: "blank-basemap" },
         { title: "Custom Styles", slug: "custom-styles" },
       ]}
     >
@@ -51,6 +55,29 @@ export default function BasicMapPage() {
         </p>
         <ComponentPreview code={controlledMapSource}>
           <ControlledMapExample />
+        </ComponentPreview>
+      </DocsSection>
+
+      <DocsSection title="Blank Basemap">
+        <p>
+          The <DocsCode>blank</DocsCode> prop swaps the default street basemap
+          for a transparent, tile-less canvas - perfect for data visualizations
+          where you draw your own layers instead of showing streets and labels.
+        </p>
+        <DocsNote>
+          <strong>Note:</strong> <DocsCode>blank</DocsCode> is a blank canvas.
+          Used alone, <DocsCode>{"<Map blank />"}</DocsCode> renders nothing -
+          you must add your own layers on top (e.g.{" "}
+          <DocsCode>MapGeoJSON</DocsCode>, <DocsCode>MapArc</DocsCode>, or
+          markers). See <DocsLink href="/docs/geojson">GeoJSON</DocsLink> for
+          more on rendering shapes on a blank map.
+        </DocsNote>
+        <p>
+          Here, a <DocsCode>MapGeoJSON</DocsCode> layer renders world country
+          borders on top of the transparent canvas.
+        </p>
+        <ComponentPreview code={blankMapSource}>
+          <BlankMapExample />
         </ComponentPreview>
       </DocsSection>
 

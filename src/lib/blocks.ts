@@ -23,6 +23,25 @@ export interface FileTree {
 
 const typedRegistry = registry as RegistrySchema;
 
+// shadcn target placeholders (e.g. "@lib/") resolve to the consumer's aliases
+// at install time. For the docs file tree, show them as friendly folder names.
+const TARGET_PLACEHOLDERS: Record<string, string> = {
+  "@components/": "components/",
+  "@ui/": "components/ui/",
+  "@lib/": "lib/",
+  "@hooks/": "hooks/",
+};
+
+function displayTarget(target?: string): string | undefined {
+  if (!target) return target;
+  for (const [prefix, replacement] of Object.entries(TARGET_PLACEHOLDERS)) {
+    if (target.startsWith(prefix)) {
+      return replacement + target.slice(prefix.length);
+    }
+  }
+  return target;
+}
+
 export function getAllBlocks(): RegistryBlockItem[] {
   return typedRegistry.items
     .filter((item) => item.type === "registry:block")
@@ -31,7 +50,10 @@ export function getAllBlocks(): RegistryBlockItem[] {
       type: item.type,
       title: item.title ?? item.name,
       description: item.description,
-      files: item.files ?? [],
+      files: (item.files ?? []).map((file) => ({
+        ...file,
+        target: displayTarget(file.target),
+      })),
       registryDependencies: item.registryDependencies ?? [],
       categories: item.categories ?? [],
       meta: item.meta,

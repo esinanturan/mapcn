@@ -60,8 +60,8 @@ export function OverviewCard() {
       <CardContent>
         <MetricChart />
         <div className="mt-2 flex items-center gap-1.5 text-xs">
-          <TrendingUp className="size-3 text-emerald-500" />
-          <span className="font-medium text-emerald-500">+12.5%</span>
+          <TrendingUp className="text-foreground size-3" />
+          <span className="text-foreground font-medium">+12.5%</span>
           <span className="text-muted-foreground">vs previous 30 days</span>
         </div>
 
@@ -82,6 +82,7 @@ export function OverviewCard() {
                 innerRadius={32}
                 outerRadius={52}
                 strokeWidth={2}
+                color="var(--color-users)"
               >
                 {deviceCategoryData.map((entry) => (
                   <Cell key={entry.name} fill={entry.fill} />

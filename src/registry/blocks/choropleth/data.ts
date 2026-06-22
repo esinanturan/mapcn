@@ -1,6 +1,3 @@
-export const COUNTRIES_GEOJSON_URL =
-  "https://cdn.jsdelivr.net/gh/martynafford/natural-earth-geojson/110m/cultural/ne_110m_admin_0_countries.json";
-
 /** Visitor counts keyed by the feature `NAME_LONG`. */
 export const visitorsByCountry: Record<string, number> = {
   Germany: 15,
@@ -22,8 +19,6 @@ export type Theme = "light" | "dark";
 
 /** Resolved colors for the choropleth, per theme. */
 interface ChoroplethColors {
-  /** Map surface behind the countries (also used for country borders). */
-  background: string;
   /** Fill for countries with no data (value 0). */
   base: string;
   /** Sequential fill ramp from low → high, mapped to `scaleStops`. */
@@ -48,16 +43,14 @@ export const mapConfig = {
   scaleStops: [0, 1, 5, 10, MAX_VISITORS] as const,
   colors: {
     light: {
-      background: "#fafafa",
       base: "#eef0f3",
       ramp: ["#d4d4d4", "#a3a3a3", "#525252", "#262626"],
       hover: "#0a0a0a",
     },
     dark: {
-      background: "#0a0a0a",
-      base: "#1a1a1a",
-      ramp: ["#404040", "#737373", "#a3a3a3", "#d4d4d4"],
-      hover: "#fafafa",
+      base: "#2e2e2e",
+      ramp: ["#404040", "#7d7d7d", "#b8b8b8", "#ededed"],
+      hover: "#ffffff",
     },
   } satisfies Record<Theme, ChoroplethColors>,
 };

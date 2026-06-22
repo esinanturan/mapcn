@@ -91,7 +91,7 @@ export function DeliveryExample() {
       stagger={9}
     >
       <Map center={[-0.105, 51.511]} zoom={12.4}>
-        <MapRoute coordinates={route} width={4} color="#4285F4" />
+        <MapRoute coordinates={route} width={4} color="#3b82f6" />
         <MapMarker longitude={store.lng} latitude={store.lat}>
           <MarkerContent>
             <div className="size-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-lg" />

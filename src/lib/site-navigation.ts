@@ -23,6 +23,7 @@ export const docsNavigation: SiteNavigationGroup[] = [
     items: [
       { title: "Getting Started", href: "/docs", icon: BookOpen },
       { title: "Installation", href: "/docs/installation", icon: BookOpen },
+      { title: "llms.txt", href: "/llms.txt", icon: BookOpen, new: true },
       { title: "API Reference", href: "/docs/api-reference", icon: BookOpen },
     ],
   },
@@ -35,6 +36,7 @@ export const docsNavigation: SiteNavigationGroup[] = [
       { title: "Popups", href: "/docs/popups", icon: Layers2 },
       { title: "Routes", href: "/docs/routes", icon: Layers2 },
       { title: "Arcs", href: "/docs/arcs", icon: Layers2 },
+      { title: "GeoJSON", href: "/docs/geojson", icon: Layers2 },
       { title: "Clusters", href: "/docs/clusters", icon: Layers2 },
       { title: "Advanced", href: "/docs/advanced-usage", icon: Layers2 },
     ],

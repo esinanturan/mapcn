@@ -25,6 +25,46 @@ const defaultStyles = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
 };
 
+// A tile-less, dependency-free style with a transparent background. Use it for
+// data visualizations (choropleths, world arcs, dot maps) where you draw your
+// own layers and don't need a street basemap. The easiest way to opt in is the
+// `blank` prop:
+//   <Map blank>...</Map>
+// The transparent background lets the themed container show through.
+const blankMapStyle: MapLibreGL.StyleSpecification = {
+  version: 8,
+  sources: {},
+  layers: [
+    {
+      id: "background",
+      type: "background",
+      paint: { "background-color": "rgba(0, 0, 0, 0)" },
+    },
+  ],
+};
+
+function mergeHoverPaint<T extends Record<string, unknown>>(
+  paint: T,
+  hoverPaint: T | undefined,
+): T {
+  if (!hoverPaint) return paint;
+  const merged: Record<string, unknown> = { ...paint };
+  for (const [key, hoverValue] of Object.entries(hoverPaint)) {
+    if (hoverValue === undefined) continue;
+    const baseValue = merged[key];
+    merged[key] =
+      baseValue === undefined
+        ? hoverValue
+        : [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            hoverValue,
+            baseValue,
+          ];
+  }
+  return merged as T;
+}
+
 type Theme = "light" | "dark";
 
 // Check document class for theme (works with next-themes, etc.)
@@ -85,6 +125,7 @@ function useResolvedTheme(themeProp?: "light" | "dark"): Theme {
 type MapContextValue = {
   map: MapLibreGL.Map | null;
   isLoaded: boolean;
+  resolvedTheme: Theme;
 };
 
 const MapContext = createContext<MapContextValue | null>(null);
@@ -127,6 +168,14 @@ type MapProps = {
     light?: MapStyleOption;
     dark?: MapStyleOption;
   };
+  /**
+   * Use a transparent, tile-less basemap instead of the default Carto street
+   * basemap — a blank canvas. Used alone it renders nothing; add your own
+   * layers on top (`<MapGeoJSON>`, `<MapArc>`, markers, etc.). Ideal for data
+   * visualizations (choropleths, arcs, dot maps).
+   * Ignored when an explicit `styles` prop is provided.
+   */
+  blank?: boolean;
   /** Map projection type. Use `{ type: "globe" }` for 3D globe view. */
   projection?: MapLibreGL.ProjectionSpecification;
   /**
@@ -172,6 +221,7 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     className,
     theme: themeProp,
     styles,
+    blank = false,
     projection,
     viewport,
     onViewportChange,
@@ -194,13 +244,20 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
   const onViewportChangeRef = useRef(onViewportChange);
   onViewportChangeRef.current = onViewportChange;
 
-  const mapStyles = useMemo(
-    () => ({
-      dark: styles?.dark ?? defaultStyles.dark,
-      light: styles?.light ?? defaultStyles.light,
-    }),
-    [styles],
-  );
+  const mapStyles = useMemo(() => {
+    // Explicit styles win. Otherwise `blank` opts into the transparent
+    // tile-less basemap; with neither, fall back to the Carto defaults.
+    if (styles) {
+      return {
+        dark: styles.dark ?? defaultStyles.dark,
+        light: styles.light ?? defaultStyles.light,
+      };
+    }
+    if (blank) {
+      return { dark: blankMapStyle, light: blankMapStyle };
+    }
+    return defaultStyles;
+  }, [styles, blank]);
 
   // Expose the map instance to the parent component
   useImperativeHandle(ref, () => mapInstance as MapLibreGL.Map, [mapInstance]);
@@ -323,8 +380,9 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     () => ({
       map: mapInstance,
       isLoaded: isLoaded && isStyleLoaded,
+      resolvedTheme,
     }),
-    [mapInstance, isLoaded, isStyleLoaded],
+    [mapInstance, isLoaded, isStyleLoaded, resolvedTheme],
   );
 
   return (
@@ -1166,6 +1224,302 @@ function MapRoute({
   return null;
 }
 
+type MapGeoJSONData<
+  P extends GeoJSON.GeoJsonProperties = GeoJSON.GeoJsonProperties,
+> =
+  | GeoJSON.FeatureCollection<GeoJSON.Geometry, P>
+  | GeoJSON.Feature<GeoJSON.Geometry, P>
+  | GeoJSON.Geometry
+  | string;
+
+type MapFillPaint = NonNullable<MapLibreGL.FillLayerSpecification["paint"]>;
+type MapLinePaint = NonNullable<MapLibreGL.LineLayerSpecification["paint"]>;
+
+/** A rendered feature with strongly-typed `properties`. */
+type MapGeoJSONFeature<
+  P extends GeoJSON.GeoJsonProperties = GeoJSON.GeoJsonProperties,
+> = Omit<MapLibreGL.MapGeoJSONFeature, "properties"> & { properties: P };
+
+/** Event payload passed to MapGeoJSON interaction callbacks. */
+type MapGeoJSONEvent<
+  P extends GeoJSON.GeoJsonProperties = GeoJSON.GeoJsonProperties,
+> = {
+  /** The feature under the cursor, with its typed GeoJSON properties. */
+  feature: MapGeoJSONFeature<P>;
+  /** Longitude of the cursor at the time of the event. */
+  longitude: number;
+  /** Latitude of the cursor at the time of the event. */
+  latitude: number;
+  /** The underlying MapLibre mouse event for advanced use cases. */
+  originalEvent: MapLibreGL.MapLayerMouseEvent;
+};
+
+type MapGeoJSONProps<
+  P extends GeoJSON.GeoJsonProperties = GeoJSON.GeoJsonProperties,
+> = {
+  /** GeoJSON data (FeatureCollection, Feature, Geometry) or a URL to fetch it from. */
+  data: MapGeoJSONData<P>;
+  /** Optional unique identifier prefix for the source/layers. Auto-generated if not provided. */
+  id?: string;
+  /**
+   * Feature property to promote to the feature `id`. Required for hover
+   * feature-state (`fillHoverPaint`) and stable `onHover`/`onClick` payloads.
+   */
+  promoteId?: string;
+  /**
+   * Paint for the polygon fill layer. Merged on top of a theme-aware monochrome
+   * surface tone (`fill-color`). Pass `false` to omit the fill layer entirely
+   * (e.g. outlines only).
+   */
+  fillPaint?: MapFillPaint | false;
+  /**
+   * Paint for the outline layer. Merged on top of a theme-aware hairline
+   * default (`line-color` = page background, `line-width` = 0.5). Pass `false`
+   * to omit the outline layer.
+   */
+  linePaint?: MapLinePaint | false;
+  /**
+   * Paint merged onto the fill layer for the feature under the cursor, applied
+   * as a `case` expression keyed on hover feature-state. Requires `promoteId`.
+   */
+  fillHoverPaint?: MapFillPaint;
+  /** Callback when a feature is clicked. */
+  onClick?: (e: MapGeoJSONEvent<P>) => void;
+  /** Callback fired when the hovered feature changes; `null` when the cursor leaves. */
+  onHover?: (e: MapGeoJSONEvent<P> | null) => void;
+  /** Whether features respond to mouse events (default: false). */
+  interactive?: boolean;
+  /** Optional MapLibre layer id to insert the layers before (z-order control). */
+  beforeId?: string;
+};
+
+// Theme-aware monochrome defaults so MapGeoJSON reads
+// clearly on the light/dark surface out of the box: a visible neutral-gray fill
+// with page-background separators between shapes. Override either via
+// `fillPaint` / `linePaint`.
+const GEOJSON_DEFAULT_COLORS = {
+  light: { fill: "#d4d4d4", line: "#fafafa" },
+  dark: { fill: "#404040", line: "#0a0a0a" },
+} satisfies Record<Theme, { fill: string; line: string }>;
+
+/**
+ * Renders arbitrary GeoJSON as fill + outline layers on the map. Composes like
+ * `MapRoute` / `MapArc` — drop it inside `<Map>` (typically with `blank`) for
+ * choropleths and region/data maps. For full control over expressions and
+ * multiple layers, manage layers directly via `useMap()` instead.
+ */
+function MapGeoJSON<
+  P extends GeoJSON.GeoJsonProperties = GeoJSON.GeoJsonProperties,
+>({
+  data,
+  id: propId,
+  promoteId,
+  fillPaint,
+  linePaint,
+  fillHoverPaint,
+  onClick,
+  onHover,
+  interactive = false,
+  beforeId,
+}: MapGeoJSONProps<P>) {
+  const { map, isLoaded, resolvedTheme } = useMap();
+  const autoId = useId();
+  const id = propId ?? autoId;
+  const sourceId = `geojson-source-${id}`;
+  const fillLayerId = `geojson-fill-${id}`;
+  const lineLayerId = `geojson-line-${id}`;
+
+  const defaults = GEOJSON_DEFAULT_COLORS[resolvedTheme];
+
+  const showFill = fillPaint !== false;
+  const showLine = linePaint !== false;
+
+  const mergedFillPaint = useMemo(
+    () =>
+      mergeHoverPaint(
+        { "fill-color": defaults.fill, ...(fillPaint || {}) },
+        fillHoverPaint,
+      ),
+    [defaults.fill, fillPaint, fillHoverPaint],
+  );
+  const mergedLinePaint = useMemo(
+    () => ({
+      "line-color": defaults.line,
+      "line-width": 0.5,
+      ...(linePaint || {}),
+    }),
+    [defaults.line, linePaint],
+  );
+  const latestRef = useRef({ onClick, onHover });
+  latestRef.current = { onClick, onHover };
+
+  // Add source on mount.
+  useEffect(() => {
+    if (!isLoaded || !map) return;
+
+    map.addSource(sourceId, {
+      type: "geojson",
+      data,
+      ...(promoteId ? { promoteId } : {}),
+    });
+
+    return () => {
+      try {
+        if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
+        if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
+      } catch {
+        // style may be mid-reload
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, map]);
+
+  // Sync data when it changes.
+  useEffect(() => {
+    if (!isLoaded || !map) return;
+    const source = map.getSource(sourceId) as
+      | MapLibreGL.GeoJSONSource
+      | undefined;
+    source?.setData(data as never);
+  }, [isLoaded, map, data, sourceId]);
+
+  // Sync layers and paint when visibility or styling changes.
+  useEffect(() => {
+    if (!isLoaded || !map) return;
+
+    const source = map.getSource(sourceId);
+    if (!source) return;
+
+    if (showFill && !map.getLayer(fillLayerId)) {
+      map.addLayer(
+        {
+          id: fillLayerId,
+          type: "fill",
+          source: sourceId,
+          paint: mergedFillPaint,
+        },
+        beforeId,
+      );
+    } else if (!showFill && map.getLayer(fillLayerId)) {
+      map.removeLayer(fillLayerId);
+    }
+
+    if (showLine && !map.getLayer(lineLayerId)) {
+      map.addLayer(
+        {
+          id: lineLayerId,
+          type: "line",
+          source: sourceId,
+          paint: mergedLinePaint,
+        },
+        beforeId,
+      );
+    } else if (!showLine && map.getLayer(lineLayerId)) {
+      map.removeLayer(lineLayerId);
+    }
+
+    if (showFill && map.getLayer(fillLayerId)) {
+      for (const [key, value] of Object.entries(mergedFillPaint)) {
+        map.setPaintProperty(
+          fillLayerId,
+          key as keyof MapFillPaint,
+          value as never,
+        );
+      }
+    }
+    if (showLine && map.getLayer(lineLayerId)) {
+      for (const [key, value] of Object.entries(mergedLinePaint)) {
+        map.setPaintProperty(
+          lineLayerId,
+          key as keyof MapLinePaint,
+          value as never,
+        );
+      }
+    }
+  }, [
+    isLoaded,
+    map,
+    sourceId,
+    fillLayerId,
+    lineLayerId,
+    showFill,
+    showLine,
+    mergedFillPaint,
+    mergedLinePaint,
+    beforeId,
+  ]);
+
+  // Interaction handlers (bound to the fill layer).
+  useEffect(() => {
+    if (!isLoaded || !map || !interactive || !showFill) return;
+
+    let hoveredId: string | number | null = null;
+
+    const setHover = (next: string | number | null) => {
+      if (next === hoveredId) return;
+      const sourceExists = !!map.getSource(sourceId);
+      if (hoveredId != null && sourceExists) {
+        map.setFeatureState(
+          { source: sourceId, id: hoveredId },
+          { hover: false },
+        );
+      }
+      hoveredId = next;
+      if (next != null && sourceExists) {
+        map.setFeatureState({ source: sourceId, id: next }, { hover: true });
+      }
+    };
+
+    const handleMouseMove = (e: MapLibreGL.MapLayerMouseEvent) => {
+      const feature = e.features?.[0];
+      if (!feature) return;
+      map.getCanvas().style.cursor = "pointer";
+
+      const featureId = feature.id;
+      if (featureId === hoveredId) return;
+      setHover(featureId ?? null);
+      latestRef.current.onHover?.({
+        feature: feature as unknown as MapGeoJSONFeature<P>,
+        longitude: e.lngLat.lng,
+        latitude: e.lngLat.lat,
+        originalEvent: e,
+      });
+    };
+
+    const handleMouseLeave = () => {
+      setHover(null);
+      map.getCanvas().style.cursor = "";
+      latestRef.current.onHover?.(null);
+    };
+
+    const handleClick = (e: MapLibreGL.MapLayerMouseEvent) => {
+      const feature = e.features?.[0];
+      if (!feature) return;
+      latestRef.current.onClick?.({
+        feature: feature as unknown as MapGeoJSONFeature<P>,
+        longitude: e.lngLat.lng,
+        latitude: e.lngLat.lat,
+        originalEvent: e,
+      });
+    };
+
+    map.on("mousemove", fillLayerId, handleMouseMove);
+    map.on("mouseleave", fillLayerId, handleMouseLeave);
+    map.on("click", fillLayerId, handleClick);
+
+    return () => {
+      map.off("mousemove", fillLayerId, handleMouseMove);
+      map.off("mouseleave", fillLayerId, handleMouseLeave);
+      map.off("click", fillLayerId, handleClick);
+      setHover(null);
+      map.getCanvas().style.cursor = "";
+    };
+  }, [isLoaded, map, fillLayerId, sourceId, interactive, showFill]);
+
+  return null;
+}
+
 /** A single arc to render inside <MapArc data={...}>. */
 type MapArcDatum = {
   /** Unique identifier for this arc. Required for hover state tracking and event payloads. */
@@ -1253,28 +1607,6 @@ const DEFAULT_ARC_LAYOUT: MapArcLineLayout = {
   "line-cap": "round",
 };
 
-function mergeArcPaint(
-  paint: MapArcLinePaint,
-  hoverPaint: MapArcLinePaint | undefined,
-): MapArcLinePaint {
-  if (!hoverPaint) return paint;
-  const merged: Record<string, unknown> = { ...paint };
-  for (const [key, hoverValue] of Object.entries(hoverPaint)) {
-    if (hoverValue === undefined) continue;
-    const baseValue = merged[key];
-    merged[key] =
-      baseValue === undefined
-        ? hoverValue
-        : [
-            "case",
-            ["boolean", ["feature-state", "hover"], false],
-            hoverValue,
-            baseValue,
-          ];
-  }
-  return merged as MapArcLinePaint;
-}
-
 function buildArcCoordinates(
   from: [number, number],
   to: [number, number],
@@ -1337,7 +1669,7 @@ function MapArc<T extends MapArcDatum = MapArcDatum>({
   const hitLayerId = `arc-hit-layer-${id}`;
 
   const mergedPaint = useMemo(
-    () => mergeArcPaint({ ...DEFAULT_ARC_PAINT, ...paint }, hoverPaint),
+    () => mergeHoverPaint({ ...DEFAULT_ARC_PAINT, ...paint }, hoverPaint),
     [paint, hoverPaint],
   );
   const mergedLayout = useMemo(
@@ -1852,7 +2184,8 @@ export {
   MapControls,
   MapRoute,
   MapArc,
+  MapGeoJSON,
   MapClusterLayer,
 };
 
-export type { MapRef, MapViewport, MapArcDatum, MapArcEvent };
+export type { MapRef, MapViewport, MapArcDatum, MapArcEvent, MapGeoJSONEvent };

@@ -26,6 +26,7 @@ const anatomyCode = `<Map>
   <MapControls />
   <MapRoute coordinates={...} />
   <MapArc data={...} />
+  <MapGeoJSON data={...} />
   <MapClusterLayer data={...} />
 </Map>`;
 
@@ -51,6 +52,7 @@ export default function ApiReferencePage() {
         { title: "MapPopup", slug: "mappopup" },
         { title: "MapRoute", slug: "maproute" },
         { title: "MapArc", slug: "maparc" },
+        { title: "MapGeoJSON", slug: "mapgeojson" },
         { title: "MapClusterLayer", slug: "mapclusterlayer" },
       ]}
     >
@@ -119,6 +121,13 @@ export default function ApiReferencePage() {
               type: "{ light?: string | StyleSpecification; dark?: string | StyleSpecification }",
               description:
                 "Custom map styles for light and dark themes. Overrides the default Carto base map tiles.",
+            },
+            {
+              name: "blank",
+              type: "boolean",
+              default: "false",
+              description:
+                "Use a transparent, tile-less basemap instead of the default Carto street basemap. This is a blank canvas — used alone it renders nothing, so you must add your own layers (e.g. MapGeoJSON, MapArc, markers) on top. Ideal for data visualizations (choropleths, arcs, dot maps). Ignored when an explicit styles prop is provided.",
             },
             {
               name: "projection",
@@ -553,9 +562,9 @@ export default function ApiReferencePage() {
             {
               name: "interactive",
               type: "boolean",
-              default: "true",
+              default: "false",
               description:
-                "Whether the route is interactive (shows pointer cursor on hover).",
+                "Respond to mouse events (hover, cursor, callbacks).",
             },
           ]}
         />
@@ -664,6 +673,98 @@ export default function ApiReferencePage() {
               name: "beforeId",
               type: "string",
               description: "Insert the arc layers before this layer id.",
+            },
+          ]}
+        />
+      </DocsSection>
+
+      {/* MapGeoJSON */}
+      <DocsSection title="MapGeoJSON">
+        <p>
+          Renders arbitrary GeoJSON as fill + outline layers. Must be used
+          inside <DocsCode>Map</DocsCode> — typically with the{" "}
+          <DocsCode>blank</DocsCode> prop for choropleths and region/data maps.
+          Accepts a <DocsCode>FeatureCollection</DocsCode>,{" "}
+          <DocsCode>Feature</DocsCode>, <DocsCode>Geometry</DocsCode>, or a URL
+          string to fetch from. Supports a generic type parameter for typed
+          feature properties: <DocsCode>{"MapGeoJSON<MyProperties>"}</DocsCode>.
+        </p>
+        <p>
+          Fill and outline default to a theme-aware monochrome surface tone, so
+          shapes read clearly on light/dark out of the box. Override either
+          layer via <DocsCode>fillPaint</DocsCode> /{" "}
+          <DocsCode>linePaint</DocsCode> (pass <DocsCode>false</DocsCode> to
+          omit a layer), and pass{" "}
+          <DocsLink
+            href="https://maplibre.org/maplibre-style-spec/expressions/"
+            external
+          >
+            MapLibre expressions
+          </DocsLink>{" "}
+          as paint values for data-driven styling. Hover highlighting via{" "}
+          <DocsCode>fillHoverPaint</DocsCode> requires{" "}
+          <DocsCode>promoteId</DocsCode>.
+        </p>
+        <DocsPropTable
+          props={[
+            {
+              name: "data",
+              type: "FeatureCollection | Feature | Geometry | string",
+              description:
+                "GeoJSON data (FeatureCollection, Feature, or Geometry) or a URL string to fetch it from.",
+            },
+            {
+              name: "id",
+              type: "string",
+              default: "auto",
+              description: "Id prefix for the underlying source/layers.",
+            },
+            {
+              name: "promoteId",
+              type: "string",
+              description:
+                "Feature property to promote to the feature id. Required for hover feature-state (fillHoverPaint) and stable onHover / onClick payloads.",
+            },
+            {
+              name: "fillPaint",
+              type: "FillLayerSpecification['paint'] | false",
+              description:
+                "Paint for the polygon fill layer, merged over a theme-aware fill-color default. Pass false to omit the fill layer (e.g. outlines only).",
+            },
+            {
+              name: "linePaint",
+              type: "LineLayerSpecification['paint'] | false",
+              description:
+                "Paint for the outline layer, merged over a theme-aware hairline default. Pass false to omit the outline layer.",
+            },
+            {
+              name: "fillHoverPaint",
+              type: "FillLayerSpecification['paint']",
+              description:
+                "Paint merged onto the fill layer for the hovered feature, applied via hover feature-state. Requires promoteId.",
+            },
+            {
+              name: "onClick",
+              type: "(e: MapGeoJSONEvent) => void",
+              description: "Fired when a feature is clicked.",
+            },
+            {
+              name: "onHover",
+              type: "(e: MapGeoJSONEvent | null) => void",
+              description:
+                "Fired when the hovered feature changes. Receives null when the cursor leaves all features.",
+            },
+            {
+              name: "interactive",
+              type: "boolean",
+              default: "false",
+              description:
+                "Respond to mouse events (hover, cursor, callbacks).",
+            },
+            {
+              name: "beforeId",
+              type: "string",
+              description: "Insert the layers before this layer id.",
             },
           ]}
         />

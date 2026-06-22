@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CSSProperties } from "react";
 
 import { ExamplesGrid } from "./_components/examples-grid";
+import { GetStartedActions } from "./_components/get-started-actions";
 import { Footer } from "@/components/footer";
 import {
   PageHeader,
@@ -22,9 +23,7 @@ export default function Page() {
           Built on MapLibre. Styled with Tailwind.
         </PageHeaderDescription>
         <PageActions>
-          <Button asChild>
-            <Link href="/docs">Get Started</Link>
-          </Button>
+          <GetStartedActions />
           <Button variant="outline" asChild>
             <Link href="/docs/basic-map">View Components</Link>
           </Button>
