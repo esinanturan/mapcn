@@ -40,7 +40,7 @@ export default function Page() {
           minZoom={1.5}
           blank
         >
-          <MapGeoJSON data={WORLD_GEOJSON} />
+          <MapGeoJSON data={WORLD_GEOJSON} linePaint={false} />
           <MapControls className="bottom-2" />
           {locations.map((location) => (
             <MapMarker
@@ -48,9 +48,9 @@ export default function Page() {
               longitude={location.lng}
               latitude={location.lat}
             >
-              <MarkerContent>
+              <MarkerContent className="group">
                 <div
-                  className="bg-muted-foreground/80 rounded-full"
+                  className="bg-muted-foreground/80 group-hover:bg-muted-foreground/90 rounded-full transition-[transform,background-color] group-hover:scale-110"
                   style={{
                     width: location.size * 3,
                     height: location.size * 3,

@@ -77,7 +77,7 @@ src/
 
 - Color palette is monochrome (grayscale oklch)
 - Radius: `0.625rem` base with computed variants
-- Animations: `fade-up`, `fade-in`, `scale-in` with staggered delays (100ms intervals)
+- Animations: `fade-up`, `fade-in`, `scale-in` with staggered delays (85ms intervals)
 - Header: sticky, backdrop-blur, gradient bottom border
 - Footer: gradient top border matching header
 

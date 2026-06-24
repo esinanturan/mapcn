@@ -33,7 +33,7 @@ export default async function Page() {
         id="blocks"
         style={
           {
-            "--stagger": 4,
+            "--stagger": 3.5,
           } as CSSProperties
         }
       >
