@@ -24,7 +24,7 @@ function bubbleSize(visitors: number) {
 export default function Page() {
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
-      <Card className="relative aspect-16/10 w-full max-w-md gap-0 overflow-hidden">
+      <Card className="relative aspect-16/10 w-full max-w-md overflow-hidden py-0">
         <div className="absolute inset-0">
           <Map
             center={[1, 30]}
@@ -57,12 +57,7 @@ export default function Page() {
           </Map>
         </div>
 
-        <div
-          className="from-card via-card/85 to-card/0 pointer-events-none absolute inset-x-0 top-0 z-10 h-24 rounded-t-xl bg-linear-to-b mask-[linear-gradient(to_bottom,black_70%,transparent)] backdrop-blur-[2px]"
-          aria-hidden
-        />
-
-        <CardHeader className="relative z-20 gap-1">
+        <CardHeader className="from-card via-card/85 to-card/0 relative z-10 gap-1 rounded-t-[inherit] bg-linear-to-b pt-4 pb-10 mask-[linear-gradient(to_bottom,black_calc(100%_-_2.5rem),transparent)] backdrop-blur-[2px]">
           <CardDescription>Visitors</CardDescription>
           <CardTitle className="text-lg tabular-nums">
             {totalVisitors}
